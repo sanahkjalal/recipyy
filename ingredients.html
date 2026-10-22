@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Ingredients</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar bg-dark">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">
+                Food Recipes
+            </a>
+
+            <a href="index.html" class="btn btn-outline-light">
+                Back to Recipes
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+
+        <div id="output">
+            <p class="text-center">Loading recipe...</p>
+        </div>
+
+    </div>
+
+    <script>
+        let display = document.getElementById("output");
+
+        // Get recipe ID from the URL
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        const fetchRecipe = async () => {
+            try {
+                if (!id) {
+                    throw new Error("Recipe ID is missing");
+                }
+
+                const res = await fetch(
+                    `https://dummyjson.com/recipes/${id}`
+                );
+
+                if (!res.ok) {
+                    throw new Error("Recipe not found");
+                }
+
+                const recipe = await res.json();
+
+                display.innerHTML = `
+                    <div class="card shadow">
+
+                        <img src="${recipe.image}"
+                            class="card-img-top"
+                            alt="${recipe.name}"
+                            style="height: 350px; object-fit: cover;">
+
+                        <div class="card-body p-4">
+
+                            <h1 class="text-center fw-bold mb-3">
+                                ${recipe.name}
+                            </h1>
+
+                            <p class="text-center text-muted">
+                                ${recipe.cuisine} Cuisine |
+                                ⭐ ${recipe.rating} |
+                                ${recipe.difficulty}
+                            </p>
+
+                            <div class="row text-center my-4">
+                                <div class="col-4">
+                                    <h6>Prep Time</h6>
+                                    <p>${recipe.prepTimeMinutes} min</p>
+                                </div>
+
+                                <div class="col-4">
+                                    <h6>Cook Time</h6>
+                                    <p>${recipe.cookTimeMinutes} min</p>
+                                </div>
+
+                                <div class="col-4">
+                                    <h6>Servings</h6>
+                                    <p>${recipe.servings}</p>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h3 class="mb-3">Ingredients</h3>
+
+                            <ul class="list-group mb-4">
+                                ${recipe.ingredients.map(item => `
+                                    <li class="list-group-item">
+                                        ${item}
+                                    </li>
+                                `).join("")}
+                            </ul>
+
+                            <h3 class="mb-3">Cooking Instructions</h3>
+
+                            <ol class="list-group list-group-numbered mb-4">
+                                ${recipe.instructions.map(step => `
+                                    <li class="list-group-item">
+                                        ${step}
+                                    </li>
+                                `).join("")}
+                            </ol>
+
+                            <div class="text-center">
+                                <a href="index.html" class="btn btn-dark">
+                                    Back to Recipes
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+
+            } catch (err) {
+                console.log(err);
+
+                display.innerHTML = `
+                    <div class="alert alert-danger text-center">
+                        Recipe not found. Please go back and select a recipe.
+                        <br><br>
+                        <a href="index.html" class="btn btn-dark">
+                            Back to Recipes
+                        </a>
+                    </div>
+                `;
+            }
+        };
+
+        fetchRecipe();
+    </script>
+
+</body>
+</html>
+
